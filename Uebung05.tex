@@ -1,0 +1,175 @@
+\documentclass[a4paper,oneside,openany]{tufte-book}
+\usepackage[utf8x]{inputenc}
+\usepackage[german]{babel}
+\usepackage{microtype} % Improves character and word spacing
+\usepackage{booktabs} % Better horizontal rules in tables
+\usepackage{ucs}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{listings}
+\usepackage{caption}
+
+\makeatletter% since we're using commands with @ in their name
+
+\let\origappendix\appendix% save a copy of the original meaning of \appendix
+\renewcommand{\appendix}{%
+  \origappendix% do all the original \appendix stuff
+  \titlecontents{chapter}%
+    [0em] % distance from left margin
+    {\vspace{1.5\baselineskip}\begin{fullwidth}\LARGE\rmfamily\itshape} % above (global formatting of entry)
+    {\hspace*{0em}\appendixname~\thecontentslabel: } % before w/label (label = ``2'')
+    {\hspace*{0em}} % before w/o label
+    {\rmfamily\upshape\qquad\thecontentspage} % filler + page (leaders and page num)
+    [\end{fullwidth}] % after
+  \titleformat{\chapter}%
+    [display]% shape
+    {\relax\ifthenelse{\NOT\boolean{@tufte@symmetric}}{\begin{fullwidth}}{}}% format applied to label+text
+    {\itshape\huge Anhang~\thechapter}% label
+    {0pt}% horizontal separation between label and title body
+    {\huge\rmfamily\itshape}% before the title body
+    [\ifthenelse{\NOT\boolean{@tufte@symmetric}}{\end{fullwidth}}{}]% after the title body
+  \setcounter{secnumdepth}{0}% ``number'' the appendices
+  \renewcommand{\thefigure}{\@arabic\c@figure}% define \thefigure to use only the figure number (1), not A.1
+  \renewcommand{\thetable}{\@arabic\c@table}%
+  %
+  % Add any other special appendix-related code here.
+  %
+}
+\makeatother% restore the special meaning of @
+
+
+\author{Schett Matthias}
+\title{SEN-\"{U}bung 05}
+\begin{document}
+\setcounter{tocdepth}{1} 
+\definecolor{gray}{rgb}{0.9,0.9,0.9}
+\lstset{language=[Visual]Basic, morekeywords={param, local}, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}, numbers=left}
+
+\frontmatter
+
+\maketitle
+\tableofcontents
+\mainmatter
+
+\chapter{Aufgabe 1}
+
+\section{L\"{o}sungsidee}
+
+Um ein Wertepaar abzuspeichern wurde eine Struktur namens DiveData erstellt. Diese Struktur wird dann in einem std::vector abgespeichert.
+
+\begin{lstlisting}[language=C++]
+struct DiveData{
+    time_t mTime;
+    double mDepth;
+    double mUpDown;
+};
+
+extern std::vector<DiveData> diveComputer;
+\end{lstlisting}
+\marginnote{Das extern vor der Deklaration des Vektors ist notwendig um Mehrfach Definitionen zu verhindern}
+
+Zum Abspeichern des Eingabestromes wird der scanner Klasse ein Eingabestrom übergeben und dieser anschließend durchgegangen und gelesen, sollten
+die Werte nicht den Erwartungen entsprechen wird eine std::exception mit der Meldung <Unknown format> ausgelöst um anzuzeigen, dass ein Fehler aufgetreten ist.
+
+Die Ausgabe erfolgt anschließend in Tabellenform, dafür wurden die Folgenden Manipulatoren erstellt.
+
+\begin{lstlisting}[language=C++]
+ostream& hr(ostream& os) {
+    return os << "-------------------------
+    ------------------------";
+}
+
+ostream& colSpace(ostream& os) {
+    return os << setw(colSpacing) << " ";
+}
+
+ostream& colWidth(ostream& os){
+    return os << setw(colWidthNum) << " ";
+}
+
+ostream& colFormat(ostream& os) {
+    return os << setw(colWidthNum);
+}
+
+ostream& formatUpDown(ostream &os){
+    return os << right << setiosflags(ios::fixed) << setprecision(4);
+}
+
+ostream& formatDepth(ostream &os){
+    return os << right << setiosflags(ios::fixed) << setprecision(2);
+}
+\end{lstlisting}
+
+Der Programmcode befindet sich ab \nameref{chap:Auf1}
+\newpage
+\section{Testf\"{a}lle}
+
+\lstinputlisting[caption=Input Testfall 1, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{DiveComputer/Test.txt}
+\lstinputlisting[caption=Input Testfall 2, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{DiveComputer/TestIncorrect.txt}
+\lstinputlisting[caption=Ausgabe, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{DiveComputer/OutputA1.txt}
+
+
+\chapter{Aufgabe 2}
+
+\section{L\"{o}sungsidee}
+
+Da eine Lagerverwaltung aus einem Lager und das Lager wiederum aus Artikeln besteht, benötigen wir 2 Klassen.
+\begin{itemize}
+  \item Article
+  \item WareHouse
+\end{itemize}
+Diese beiden Klassen ermöglichen uns dann die Lagerverwaltung.
+
+Ein Artikel besteht aus :
+\begin{lstlisting}
+    int mArticleNumber;
+    std::string mArticleName;
+    size_t mQuantity;
+    double mPrice;
+\end{lstlisting}
+Jeder dieser Member bestitzt eine Getter und eine Setter Methode die es erlaubt die Werte zu lesen und zu verändern. Weiters wurde operator< überschrieben um die Lagermenge\sidenote{mQuantity} zu vergleichen.
+\begin{lstlisting}
+bool Article::operator<(Article const & vgl) const{
+    return (mQuantity < vgl.mQuantity);
+}
+\end{lstlisting}
+
+Das Lager besteht aus:
+\begin{lstlisting}
+    std::vector<Article> mArticles;
+    std::string mWareHouseName;
+\end{lstlisting}
+Hier bestizt allerdings keiner der Member eine Getter oder Setter Funktion. Es gibt nur eine GetNumberOfArticles Funktion die, die aktuelle Größe des std::vector ausgibt.
+Um einen neuen Artikel abzuspeichern gibt es die AddArticle(Article const \&newArticle) Funtkion, die std::vector::push\_back aufruft.
+Es gibt auch die Möglichkeit aus einem File einzulesen, dabei hilft abermals die scanner Klasse und liest das File ein, tritt bei der Verarbeitung ein Fehler auf, 
+wenn das Format nicht richtig ist, wird eine std::exception geworfen mit der Meldung <Unknown format>.
+Die Ausgabe erfolgt anschließend im vorgegebenen Tabellenformat.
+
+Der Quellcode findet sich ab \nameref{chap:Auf2}
+
+\section{Testf\"{a}lle}
+\lstinputlisting[caption=Input Testfall 1, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{WarehouseManager/Input.txt}
+\lstinputlisting[caption=Input Testfall 2, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{WarehouseManager/InputWrong.txt}
+\lstinputlisting[caption=Ausgabe, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{WarehouseManager/OutputA2.txt}
+
+\backmatter
+
+\appendix
+
+\setboolean{@mainmatter}{true}
+\chapter{Aufgabe 1}\label{chap:Auf1}
+\lstinputlisting[caption=Header für den Tauchcomputer, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{DiveComputer/DiveComputer.h}
+\lstinputlisting[caption=Implementierung des Tauchcomputers, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{DiveComputer/DiveComputer.cpp}
+\lstinputlisting[caption=Testtreiber, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{DiveComputer/Main.cpp}
+
+\chapter{Aufgabe 2}\label{chap:Auf2}
+\lstinputlisting[caption=Header für den Artikel, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{WarehouseManager/Article.h}
+\lstinputlisting[caption=Implementierung des Artikels, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{WarehouseManager/Article.cpp}
+\lstinputlisting[caption=Header für das Lager, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{WarehouseManager/WareHouse.h}
+\lstinputlisting[caption=Implementierung des Lagers, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{WarehouseManager/WareHouse.cpp}
+\lstinputlisting[caption=Testtreiber, breaklines=true, tabsize=4, showstringspaces=false,backgroundcolor=\color{gray}]{WarehouseManager/Main.cpp}
+
+\end{document}

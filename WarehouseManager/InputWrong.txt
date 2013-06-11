@@ -1,0 +1,2 @@
+4711 - "Kabelkanal (3m)" - 10 -;
+1147 - "Installationsrohr (5m)" - 49 - 3.49;

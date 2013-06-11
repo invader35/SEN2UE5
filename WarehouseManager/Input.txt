@@ -1,0 +1,6 @@
+4711 - "Kabelkanal (3m)" - 10 - 1.50;
+1147 - "Installationsrohr (5m)" - 49 - 3.49;
+7141 - "Funksteckdose" - 3 - 11.99;
+1471 - "Wechselschalter" - 17 - 7.90;
+1417 - "Ein-/Ausschalter" - 24 - 6.99;
+1714 - "Zeitschaltuhr" - 5 - 33.50;
